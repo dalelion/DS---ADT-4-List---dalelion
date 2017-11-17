@@ -6,7 +6,7 @@ public class LinkedList<T> implements ListInterface<T>, Iterable<T> {
 
 	public static void main(String args[]) {
 		
-		
+		System.out.println("Test");
 		
 	}	
 	
