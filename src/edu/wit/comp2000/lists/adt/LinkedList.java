@@ -8,6 +8,7 @@ public class LinkedList<T extends Comparable<T>> implements ListInterface<T>, It
 
 		LinkedList<Integer> l = new LinkedList<Integer>();
 
+		l.add(8);
 		l.add(3);
 		l.add(2);
 		l.add(1);
@@ -44,27 +45,36 @@ public class LinkedList<T extends Comparable<T>> implements ListInterface<T>, It
 	}
 
 	@Override
-	public boolean add(int newPosition, T newEntry) {
+    public boolean add(int newPosition, T newEntry) {
 
-		Node<T> newNode = new Node<T>(newEntry);
-		if (newPosition < 0 || newPosition > size + 1) {
-			return false;
-		} else if (newPosition == 0 && this.isEmpty()) {
-			firstNode = newNode;
-			lastNode = newNode;
-		} else if (newPosition == size + 1) {
-			add(newEntry);
-		} else {
-			Node<T> n = firstNode;
-			while (newPosition > 0) {
-				n = n.getNext();
-				--newPosition;
-			}
-			n.setNext(newNode);
-		}
-
-		return true;
-	}
+        Node<T> newNode = new Node<T>(newEntry);
+        if (newPosition < 0 || newPosition > size) {
+            return false;
+        } else if (newPosition == 0 && this.isEmpty()) {
+            firstNode = newNode;
+            lastNode = newNode;
+            ++size;
+        } else if (newPosition == size + 1) {
+            add(newEntry);
+        } else {
+            Node<T> n = this.firstNode;
+            if (newPosition == 0) {
+                newNode.setNext(n.getNext());
+                this.firstNode = newNode;
+            } else {
+                for (int i = 0; i < newPosition - 1; ++i) {
+                    n = n.getNext();
+                }
+                newNode.setNext(n.getNext());
+                n.setNext(newNode);
+                if(newNode.getNext() == null) {
+                    this.lastNode = newNode;
+                }
+            }
+            ++size;
+        }
+        return true;
+    }
 
 	@Override
 	public void clear() {
@@ -76,26 +86,26 @@ public class LinkedList<T extends Comparable<T>> implements ListInterface<T>, It
 	}
 
 	@Override
-	public T remove(int givenPosition) {
-
-		if (givenPosition < 0 || givenPosition > size) {
-			return null;
-		}
-
-		Node<T> n = this.firstNode;
-		T removedElement;
-
-		while (givenPosition > 1) {
-			n = n.getNext();
-			--givenPosition;
-		}
-
-		removedElement = n.getNext().getValue();
-
-		n.setNext(n.getNext().getNext());
-
-		return removedElement;
-	}
+    public T remove(int givenPosition) {
+        if (givenPosition >= 0 && givenPosition < size) {
+            Node<T> n = this.firstNode;
+            T t = null;
+            if(givenPosition == 0) {
+                t = this.firstNode.getValue();
+                this.firstNode = this.firstNode.getNext();
+            } else {
+                for(int i = 0; i < givenPosition - 1; ++i) {
+                    n = n.getNext();
+                }
+                t = n.getNext().getValue();
+                n.setNext(n.getNext().getNext());
+            }
+            --size;
+            return t;
+        } else {
+            return null;
+        }
+    }
 
 	@Override
 	public boolean replace(int givenPosition, T newEntry) {
@@ -115,14 +125,15 @@ public class LinkedList<T extends Comparable<T>> implements ListInterface<T>, It
 	@Override
 	public T getEntry(int givenPosition) {
 
-		if (givenPosition < 0 || givenPosition > size)
+		if (givenPosition < 0 || givenPosition >= size)
 			return null;
 
-		for (T value : this) {
-			if (givenPosition <= 0) return value;
-			--givenPosition;
+		Node<T> n = firstNode;
+
+		for (int i = 0; i < givenPosition; i++) {
+			n = n.getNext();
 		}
-		return null;
+		return n.getValue();
 	}
 
 	@Override
@@ -195,12 +206,11 @@ public class LinkedList<T extends Comparable<T>> implements ListInterface<T>, It
 
 	public void sort() {
 
-		int count = 0;
 		boolean sorted = false;
 		for (int i = this.size; i >= 0 && !sorted; i--) {
 			sorted = true;
 			for (int j = 0; j < this.size - 1; j++) {
-				count++;
+				System.out.println(this.toString());
 				if (this.getEntry(j).compareTo(this.getEntry(j + 1)) > 0) {
 					this.add(j + 1, this.remove(j));
 					sorted = false;
