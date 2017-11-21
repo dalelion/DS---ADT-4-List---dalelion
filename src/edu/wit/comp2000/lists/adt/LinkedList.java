@@ -2,11 +2,22 @@ package edu.wit.comp2000.lists.adt;
 
 import java.util.Iterator;
 
-public class LinkedList<T extends Comparable<? super T>> implements ListInterface<T>, Iterable<T>, Comparable<T> {
+public class LinkedList<T extends Comparable<T>> implements ListInterface<T>, Iterable<T>, Comparable<T> {
 
 	public static void main(String args[]) {
 		
-		System.out.println("Test");
+		LinkedList<Integer> l = new LinkedList<Integer>();
+		
+		l.add(3);
+		l.add(2);
+		l.add(1);
+		l.add(8);
+		l.add(-1);
+		
+		
+		System.out.println(l.toString());
+		l.sort();
+		System.out.println(l.toString());
 		
 	}	
 	
@@ -143,16 +154,36 @@ public class LinkedList<T extends Comparable<? super T>> implements ListInterfac
 		return false;
 	}
 
+	class ListIterator implements Iterator<T> {
+		
+		private int index;
+		private T[] array;
+		
+		public ListIterator() {
+			array = LinkedList.this.toArray();
+			index = 0;
+		}
+		
+		@Override
+		public boolean hasNext() {
+			return index < array.length;
+		}
+
+		@Override
+		public T next() {
+			return array[index++];
+		}
+		
+	}
+	
 	@Override
 	public Iterator<T> iterator() {
-		return this.iterator();
+		return new ListIterator();
 	}
 
 	public T[] toArray() {
 
-		Comparable[] compArray = new Comparable[this.size];
-
-		T[] array = (T[]) compArray;
+		T[] array = (T[]) new Comparable[this.size];
 		
 		for (int i = 0; i < size; i++) {
 			array[i] = this.getEntry(i);
@@ -162,8 +193,25 @@ public class LinkedList<T extends Comparable<? super T>> implements ListInterfac
 
 	@Override
 	public int compareTo(T arg0) {
-				
+		//Unnecessary since comparing can be done through the nodes.
 		return 0;
+	}
+	
+	public void sort() {
+		
+		int count = 0;
+        boolean sorted = false;
+        for (int i = this.size;i >= 0 && !sorted; i--) {
+            sorted = true;
+            for (int j = 0;j < this.size - 1;j++) {
+                count++;
+                if (this.getEntry(j).compareTo(this.getEntry(j+1)) > 0) {
+                    this.add(j+1, this.remove(j));
+                    sorted = false;
+                }
+            }
+        }
+		
 	}
 
 	@Override
@@ -178,7 +226,7 @@ public class LinkedList<T extends Comparable<? super T>> implements ListInterfac
 	}
 }
 
-class Node<T> {
+class Node<T extends Comparable<T>> implements Comparable<Node<T>>{
 
 	private Node<T> next;
 	private T value;
@@ -206,6 +254,11 @@ class Node<T> {
 
 	public void setValue(T val) {
 		this.value = val;
+	}
+
+	@Override
+	public int compareTo(Node<T> o) {
+		return this.getValue().compareTo(o.getValue());
 	}
 
 }
