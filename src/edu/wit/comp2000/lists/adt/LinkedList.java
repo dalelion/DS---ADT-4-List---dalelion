@@ -2,7 +2,7 @@ package edu.wit.comp2000.lists.adt;
 
 import java.util.Iterator;
 
-public class LinkedList<T> implements ListInterface<T>, Iterable<T> {
+public class LinkedList<T extends Comparable<? super T>> implements ListInterface<T>, Iterable<T>, Comparable<T> {
 
 	public static void main(String args[]) {
 		
@@ -10,7 +10,7 @@ public class LinkedList<T> implements ListInterface<T>, Iterable<T> {
 		
 	}	
 	
-	private Node firstNode, lastNode;
+	private Node<T> firstNode, lastNode;
 	private int size;
 
 	public LinkedList() {
@@ -80,7 +80,7 @@ public class LinkedList<T> implements ListInterface<T>, Iterable<T> {
 			--givenPosition;
 		}
 		
-		removedElement = n.getNext().getElement();
+		removedElement = n.getNext().getValue();
 		
 		n.setNext(n.getNext().getNext());
 		
@@ -98,7 +98,7 @@ public class LinkedList<T> implements ListInterface<T>, Iterable<T> {
 			n = n.getNext();
 			--givenPosition;
 		}		
-		n.setElement(newEntry);
+		n.setValue(newEntry);
 		return true;
 	}
 
@@ -108,14 +108,14 @@ public class LinkedList<T> implements ListInterface<T>, Iterable<T> {
 		if (givenPosition < 0 || givenPosition > size)
 			return null;
 		
-		Node n = this.firstNode;
+		Node<T> n = this.firstNode;
 		
 		while (givenPosition > 0) {
 			n = n.getNext();
 			--givenPosition;
 		}
 		
-		return (T) n.getElement();
+		return (T) n.getValue();
 	}
 
 	@Override
@@ -150,12 +150,20 @@ public class LinkedList<T> implements ListInterface<T>, Iterable<T> {
 
 	public T[] toArray() {
 
-		T[] array = null;
+		Comparable[] compArray = new Comparable[this.size];
 
+		T[] array = (T[]) compArray;
+		
 		for (int i = 0; i < size; i++) {
 			array[i] = this.getEntry(i);
 		}
 		return array;
+	}
+
+	@Override
+	public int compareTo(T arg0) {
+				
+		return 0;
 	}
 
 	@Override
@@ -168,20 +176,19 @@ public class LinkedList<T> implements ListInterface<T>, Iterable<T> {
 		sb.append("[LastNode]");
 		return sb.toString();
 	}
-
 }
 
 class Node<T> {
 
 	private Node<T> next;
-	private T element;
+	private T value;
 
-	public Node(T element) {
-		this.element = element;
+	public Node(T val) {
+		this.value = val;
 	}
 
-	public Node(T element, Node<T> next) {
-		this(element);
+	public Node( Node<T> next, T val) {
+		this(val);
 		this.next = next;
 	}
 
@@ -193,12 +200,12 @@ class Node<T> {
 		this.next = next;
 	}
 
-	public T getElement() {
-		return element;
+	public T getValue() {
+		return value;
 	}
 
-	public void setElement(T element) {
-		this.element = element;
+	public void setValue(T val) {
+		this.value = val;
 	}
 
 }
